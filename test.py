@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 
-from models import Product, Review
+from models import Product, Review, Cate_1, Cate_2, Vectors
 from database import SessionLocal
 from datetime import datetime
 
