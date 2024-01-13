@@ -6,7 +6,7 @@ from database import Base
 class Product(Base):
     __tablename__ = "PRODUCT"
 
-    id_ = Column('ProdId', String(6), primary_key=True)
+    id_ = Column('ProdId', String(6), primary_key=True, unique=True)
     name = Column('ProdName', String(50), nullable=False)
     img_path = Column('ProdImgPath', String)
     img_url = Column('ProdImgUrl', String)
@@ -20,7 +20,7 @@ class Product(Base):
 class Review(Base):
     __tablename__ = "REVIEW"
 
-    id_ = Column('RevId', String(8), primary_key=True)
+    id_ = Column('RevId', String(8), primary_key=True, unique=True)
     prod_id = Column('ProdId', String(6), ForeignKey('PRODUCT.ProdId'), nullable=False)
     writer = Column('Writer', String(4), nullable=False)
     img_path = Column('RevImgPath', String)
@@ -35,19 +35,19 @@ class Review(Base):
 class Cate_1(Base):
     __tablename__ = "CATE1"
 
-    id_ = Column('CateId', String(2), primary_key=True)
+    id_ = Column('CateId', String(2), primary_key=True, unique=True)
     name = Column('CateName', String(10), nullable=False)
 
 
 class Cate_2(Base):
     __tablename__ = "CATE2"
 
-    id_ = Column('CateId', String(2), primary_key=True)
+    id_ = Column('CateId', String(2), primary_key=True, unique=True)
     name = Column('CateName', String(10), nullable=False)
 
 
 class Vectors(Base):
     __tablename__ = "VECTORS"
 
-    id_ = Column('RevId', String(6), primary_key=True)
+    id_ = Column('RevId', String(6), primary_key=True, unique=True)
     vector = Column('Vector', LargeBinary(), nullable=False)
