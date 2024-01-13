@@ -23,6 +23,6 @@ app.add_middleware(
 
 @app.get("/hello")
 def hello():
-    return {"message": "안녕하세요 파이보"}
+    return {"message": "hello world"}
 
 

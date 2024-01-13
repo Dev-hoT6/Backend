@@ -1,50 +1,53 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, LargeBinary, ForeignKey
 from sqlalchemy.orm import relationship
 
 from database import Base
 
 class Product(Base):
-    __tablename__ = "product"
+    __tablename__ = "PRODUCT"
 
-    # primary_key=True
-    id = Column(Integer, primary_key=True, autoincrement=True )
-    name = Column(String)
-    img_url = Column(String)
-    price = Column(Integer)
-    # "Electronics, Gadgets" 이런식으로 문자열로 리스트를 만든다.
-    category = Column(String)
-    description = Column(String)
-    hashtag = Column(String)
+    id_ = Column('ProdId', String(6), primary_key=True)
+    name = Column('ProdName', String(50), nullable=False)
+    img_path = Column('ProdImgPath', String)
+    img_url = Column('ProdImgUrl', String)
+    price = Column('ProdPrice', Integer, nullable=False)
+    cate1 = Column('ProdCategory1', String(2), nullable=False)
+    cate2 = Column('ProdCategory2', String(2))
+    description = Column('ProdDescription', String(200), nullable=False)
+    hashtag = Column('Hashtag', String(200)) # 띄어쓰기로 구분
+
 
 class Review(Base):
-    __tablename__ = "review"
+    __tablename__ = "REVIEW"
 
-    id = Column(Integer, primary_key=True)
-    content = Column(Text, nullable=False)
-    create_date = Column(DateTime, nullable=False)
-    #question의 id 컬럼과 연계 된다는 의미
-    product_id = Column(Integer, ForeignKey("product.id"))
-    product = relationship("Product", backref="answers")
-# {
-#   "squadName": "Super hero squad",
-#   "homeTown": "Metro City",
-#   "formed": 2016,
-#   "secretBase": "Super tower",
-#   "active": true,
-#   "members": [
-#     {
-#       "name": "Molecule Man",
-#       "age": 29,
-#       "secretIdentity": "Dan Jukes",
-#       "powers": ["Radiation resistance", "Turning tiny", "Radiation blast"]
-#     },
-#     {
-#       "name": "Madame Uppercut",
-#       "age": 39,
-#       "secretIdentity": "Jane Wilson",
-#       "powers": [
-#         "Million tonne punch",
-#         "Damage resistance",
-#         "Superhuman reflexes"
-#       ]
-#     },
+    id_ = Column('RevId', String(8), primary_key=True)
+    prod_id = Column('ProdId', String(6), ForeignKey('PRODUCT.ProdId'), nullable=False)
+    writer = Column('Writer', String(4), nullable=False)
+    img_path = Column('RevImgPath', String)
+    img_url = Column('RevImgUrl', String)
+    content = Column('Content', String(300), nullable=False)
+    points = Column('Points', Integer, default=0)
+    status = Column('Status', Integer, default=0)
+
+    products = relationship('PRODUCT', backref='reviews')
+
+
+class Cate_1(Base):
+    __tablename__ = "CATE1"
+
+    id_ = Column('CateId', String(2), primary_key=True)
+    name = Column('CateName', String(10), nullable=False)
+
+
+class Cate_2(Base):
+    __tablename__ = "CATE2"
+
+    id_ = Column('CateId', String(2), primary_key=True)
+    name = Column('CateName', String(10), nullable=False)
+
+
+class Vectors(Base):
+    __tablename__ = "VECTORS"
+
+    id_ = Column('RevId', String(6), primary_key=True)
+    vector = Column('Vector', LargeBinary(), nullable=False)

@@ -1,0 +1,5 @@
+myapi.db
+*.pyc
+__pycache__
+migrations/versions/*
+test.py
