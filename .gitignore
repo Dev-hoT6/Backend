@@ -1,5 +1,6 @@
 myapi.db
 *.pyc
-__pycache__
-migrations/versions/*
 test.py
+*.ipynb
+
+__pycache__
