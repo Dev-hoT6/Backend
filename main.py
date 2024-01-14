@@ -1,8 +1,7 @@
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-from database import SessionLocal
-from models import Product
+from domain import goods_list
 
 app = FastAPI()
 
@@ -19,10 +18,4 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-
-@app.get("/hello")
-def hello():
-    return {"message": "hello world"}
-
-
+app.include_router(goods_list.router)

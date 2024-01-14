@@ -29,7 +29,7 @@ class Review(Base):
     points = Column('Points', Integer, default=0)
     status = Column('Status', Integer, default=0)
 
-    products = relationship('PRODUCT', backref='reviews')
+    products = relationship('Product', backref='reviews')
 
 
 class Cate_1(Base):

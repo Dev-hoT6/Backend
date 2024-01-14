@@ -13,7 +13,7 @@ cate1 = 'data_prototype/cate_1.csv'
 # vectors = 'data_prototype/vectors.csv',
 
 product = pd.read_csv(product,
-                     dtype={'ProdId':str, 'ProdName':str, 'ProdPrice':int}
+                     dtype={'ProdId':str, 'ProdName':str, 'ProdPrice':int, 'ProdCategory1':str}
                      )
 review = pd.read_csv(review,
                      dtype={'RevId':str, 'ProdId':str}
