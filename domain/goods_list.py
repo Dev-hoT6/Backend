@@ -3,6 +3,9 @@ from fastapi import APIRouter, HTTPException
 from database import SessionLocal
 from models import Product, Cate_1
 
+
+
+
 router = APIRouter(
     prefix="/product",
 )

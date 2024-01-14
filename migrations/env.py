@@ -1,9 +1,7 @@
 from logging.config import fileConfig
-
+import models
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
-
-import models
 
 from alembic import context
 
@@ -60,7 +58,7 @@ def run_migrations_online() -> None:
 
     """
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section),
+        config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )

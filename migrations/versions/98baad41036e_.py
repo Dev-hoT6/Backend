@@ -1,19 +1,21 @@
-"""first
+"""empty message
 
-Revision ID: 08736cacc4a6
+Revision ID: 98baad41036e
 Revises: 
-Create Date: 2024-01-14 02:40:32.755931
+Create Date: 2024-01-14 21:57:10.702572
 
 """
+from typing import Sequence, Union
+
 from alembic import op
 import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '08736cacc4a6'
-down_revision = None
-branch_labels = None
-depends_on = None
+revision: str = '98baad41036e'
+down_revision: Union[str, None] = None
+branch_labels: Union[str, Sequence[str], None] = None
+depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
@@ -31,7 +33,7 @@ def upgrade() -> None:
     sa.UniqueConstraint('CateId')
     )
     op.create_table('PRODUCT',
-    sa.Column('ProdId', sa.String(length=6), nullable=False),
+    sa.Column('ProdId', sa.String(length=7), nullable=False),
     sa.Column('ProdName', sa.String(length=50), nullable=False),
     sa.Column('ProdImgPath', sa.String(), nullable=True),
     sa.Column('ProdImgUrl', sa.String(), nullable=True),
