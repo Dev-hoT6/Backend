@@ -6,7 +6,7 @@ from database import Base
 class Product(Base):
     __tablename__ = "PRODUCT"
 
-    id_ = Column('ProdId', String(6), primary_key=True, unique=True)
+    id_ = Column('ProdId', String(7), primary_key=True, unique=True)
     name = Column('ProdName', String(50), nullable=False)
     img_path = Column('ProdImgPath', String)
     img_url = Column('ProdImgUrl', String)
