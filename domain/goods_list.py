@@ -1,7 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 from database import SessionLocal
-from models import Product, Cate_1, Cate_2
+from models import Product, Cate_1
 
 router = APIRouter(
     prefix="/product",
@@ -14,19 +14,39 @@ def get_goods_list():
         # goods_list = db.query(Product).all()
 
         goods_list = db.query(Product.id_, Product.name, Product.price, Product.img_url).all()
-        cate_list = db.query(Cate_1.name).all()
+        cate_list = db.query(Cate_1.id_, Cate_1.name).all()
     n_goods = len(goods_list)
-    cate_list = [x[0] for x in cate_list]
     return {
         'n_goods' : n_goods,
-        'category' : cate_list,
+        'category' : [{'id':i, 'name': n} for i, n in cate_list],
         'goods' : [{'id':i, 'name': n, 'price':p, 'img_url':u} for i, n, p, u in goods_list]
     }
 
 
-# @router.get('/categories/{}')
-# def get_cate_goods_list():
-#     return {
-#         'id' : '68155',
-#         'cate' : '01'
-#     }
+@router.get('/category/{CateId}')
+def get_cate_goods_list(CateId: str):
+    with SessionLocal() as db:
+        if CateId in ['01', '02', '03', '04', '05']:
+            result = db.query(Product.id_, Product.name, Product.price, Product.img_url, Cate_1.name)\
+                .join(Cate_1, Product.cate1 == Cate_1.id_)\
+                .where(Product.cate1 == CateId).all()
+
+            if len(result) == 0:
+                catename = db.query(Cate_1.name)\
+                    .where(Cate_1.id_ == '01').one()
+            
+                return {
+                    'n_goods' : 0,
+                    'category' : [{'id':CateId, 'name': catename[0]}],
+                    'goods' : []
+                }
+            else:
+            
+                return {
+                    'n_goods' : len(result),
+                    'category' : [{'id':CateId, 'name': result[0][-1]}],
+                    'goods' : [{'id':i, 'name': n, 'price':p, 'img_url':u} for i, n, p, u, _ in result]
+                }
+            
+        else:
+            raise HTTPException(status_code=404, detail="Category not found") 
