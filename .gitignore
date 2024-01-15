@@ -2,5 +2,6 @@ myapi.db
 *.pyc
 test.py
 *.ipynb
+*.pt
 
 __pycache__
