@@ -1,8 +1,8 @@
-"""empty message
+"""model revision 240116
 
-Revision ID: 98baad41036e
+Revision ID: 71c992ed71d8
 Revises: 
-Create Date: 2024-01-14 21:57:10.702572
+Create Date: 2024-01-16 02:49:25.187978
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '98baad41036e'
+revision: str = '71c992ed71d8'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -47,12 +47,12 @@ def upgrade() -> None:
     )
     op.create_table('VECTORS',
     sa.Column('RevId', sa.String(length=6), nullable=False),
-    sa.Column('Vector', sa.LargeBinary(), nullable=False),
+    sa.Column('Vector', sa.PickleType(), nullable=False),
     sa.PrimaryKeyConstraint('RevId'),
     sa.UniqueConstraint('RevId')
     )
     op.create_table('REVIEW',
-    sa.Column('RevId', sa.String(length=8), nullable=False),
+    sa.Column('RevId', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('ProdId', sa.String(length=6), nullable=False),
     sa.Column('Writer', sa.String(length=4), nullable=False),
     sa.Column('RevImgPath', sa.String(), nullable=True),
@@ -61,8 +61,7 @@ def upgrade() -> None:
     sa.Column('Points', sa.Integer(), nullable=True),
     sa.Column('Status', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['ProdId'], ['PRODUCT.ProdId'], ),
-    sa.PrimaryKeyConstraint('RevId'),
-    sa.UniqueConstraint('RevId')
+    sa.PrimaryKeyConstraint('RevId')
     )
     # ### end Alembic commands ###
 

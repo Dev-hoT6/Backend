@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, LargeBinary, ForeignKey
+from sqlalchemy.types import PickleType
 from sqlalchemy.orm import relationship
 
 from database import Base
@@ -50,4 +51,4 @@ class Vectors(Base):
     __tablename__ = "VECTORS"
 
     id_ = Column('RevId', String(6), primary_key=True, unique=True)
-    vector = Column('Vector', LargeBinary(), nullable=False)
+    vector = Column('Vector', PickleType(), nullable=False)
