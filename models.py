@@ -6,7 +6,7 @@ from database import Base
 class Product(Base):
     __tablename__ = "PRODUCT"
 
-    id_ = Column('ProdId', String(6), primary_key=True, unique=True)
+    id_ = Column('ProdId', String(7), primary_key=True, unique=True)
     name = Column('ProdName', String(50), nullable=False)
     img_path = Column('ProdImgPath', String)
     img_url = Column('ProdImgUrl', String)
@@ -20,7 +20,7 @@ class Product(Base):
 class Review(Base):
     __tablename__ = "REVIEW"
 
-    id_ = Column('RevId', String(8), primary_key=True, unique=True)
+    id_ = Column('RevId', Integer, primary_key=True, autoincrement=True)
     prod_id = Column('ProdId', String(6), ForeignKey('PRODUCT.ProdId'), nullable=False)
     writer = Column('Writer', String(4), nullable=False)
     img_path = Column('RevImgPath', String)

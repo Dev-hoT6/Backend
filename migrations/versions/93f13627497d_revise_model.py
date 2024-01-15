@@ -1,8 +1,8 @@
-"""first
+"""revise model
 
-Revision ID: 08736cacc4a6
+Revision ID: 93f13627497d
 Revises: 
-Create Date: 2024-01-14 02:40:32.755931
+Create Date: 2024-01-15 02:23:59.652753
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '08736cacc4a6'
+revision = '93f13627497d'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -31,7 +31,7 @@ def upgrade() -> None:
     sa.UniqueConstraint('CateId')
     )
     op.create_table('PRODUCT',
-    sa.Column('ProdId', sa.String(length=6), nullable=False),
+    sa.Column('ProdId', sa.String(length=7), nullable=False),
     sa.Column('ProdName', sa.String(length=50), nullable=False),
     sa.Column('ProdImgPath', sa.String(), nullable=True),
     sa.Column('ProdImgUrl', sa.String(), nullable=True),
@@ -50,7 +50,7 @@ def upgrade() -> None:
     sa.UniqueConstraint('RevId')
     )
     op.create_table('REVIEW',
-    sa.Column('RevId', sa.String(length=8), nullable=False),
+    sa.Column('RevId', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('ProdId', sa.String(length=6), nullable=False),
     sa.Column('Writer', sa.String(length=4), nullable=False),
     sa.Column('RevImgPath', sa.String(), nullable=True),
@@ -59,8 +59,7 @@ def upgrade() -> None:
     sa.Column('Points', sa.Integer(), nullable=True),
     sa.Column('Status', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['ProdId'], ['PRODUCT.ProdId'], ),
-    sa.PrimaryKeyConstraint('RevId'),
-    sa.UniqueConstraint('RevId')
+    sa.PrimaryKeyConstraint('RevId')
     )
     # ### end Alembic commands ###
 

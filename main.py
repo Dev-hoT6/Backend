@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-from domain import goods_list
+from domain import goods_list, create_review
 
 app = FastAPI()
 
@@ -19,3 +19,4 @@ app.add_middleware(
 )
 
 app.include_router(goods_list.router)
+app.include_router(create_review.router)
