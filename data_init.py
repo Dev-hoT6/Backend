@@ -9,7 +9,7 @@ db_name = 'myapi.db'
 product = 'data_prototype/product.csv'
 review = 'data_prototype/reviews.csv'
 cate1 = 'data_prototype/cate_1.csv'
-# cate2 = 'data_prototype/cate_2.csv',
+cate2 = 'data_prototype/cate_2.csv',
 # vectors = 'data_prototype/vectors.csv',
 
 product = pd.read_csv(product,
@@ -21,13 +21,16 @@ review = pd.read_csv(review,
 cate1 = pd.read_csv(cate1,
                      dtype={'CateId':str, 'CateName':str}
                      )
+cate_2 = pd.read_csv(cate_2,
+                     dtype={'CateId':str, 'CateName':str}
+                     )
 
 
 data_list = [
     product, 
     review,
     cate1,
-    # cate2,
+    cate2,
     # vectors
 ]
 
@@ -35,7 +38,7 @@ table_list = [
     'PRODUCT',
     'REVIEW',
     'CATE1',
-    # 'CATE2',
+    'CATE2',
     # 'VECTORS'
 ]
 # def get_data(sql, db):
