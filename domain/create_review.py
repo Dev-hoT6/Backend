@@ -11,6 +11,7 @@ from models import Review, Product, Vectors, Cate_1
 
 from neural_networks.vectorizer import sbert
 from neural_networks.binarizer import *
+from neural_networks.scorer import *
 
 router = APIRouter(
     prefix="/review/create",
@@ -21,7 +22,7 @@ router = APIRouter(
 def create_review(prod_id, db: Session, review: ReviewCreate):
     db_review = Review(prod_id=prod_id,
                        writer=review.writer,
-                       img_url=review.img_url,
+                       img_url=review.img_file,
                        content=review.content)
     db.add(db_review)
     db.commit()
@@ -32,6 +33,11 @@ def create_vector(rev_id, vec, db: Session):
     db_vector = Vectors(id_=rev_id,
                         vector=vec)
     db.add(db_vector)
+    db.commit()
+
+def update_score_point(rev_id, points, db: Session):
+    db.query(Review).where(Review.id_ == str(rev_id)).update({Review.points:points, Review.status:2})
+    db.query(Vectors).where(Vectors.id_ == str(rev_id)).delete()
     db.commit()
     
 
@@ -77,6 +83,16 @@ def get_review_point(rev_id:str, db: Session = Depends(get_db)):
 
     ## Response: 등록 성공 코드(201)
 
+    # 벡터 찾아오기
     vec = db.query(Vectors.vector).where(Vectors.id_ == str(rev_id)).first()[0]
+    
+    # 벡터로 1-3 점수 계산
+    score = get_score(vec)
+    point = get_point(score)
 
-    return {'vector':rev_id}
+    update_score_point(rev_id, point, db)
+
+    return {
+        'score' : score,
+        'point' : point
+    }
