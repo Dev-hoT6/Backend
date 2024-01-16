@@ -3,7 +3,7 @@ from pydantic import BaseModel, field_validator
 
 class ReviewCreate(BaseModel):
     writer: str
-    img_url: str
+    img_file: str
     content: str
 
     # @field_validator('content')

@@ -3,5 +3,6 @@ myapi.db
 test.py
 *.ipynb
 *.pt
+*.onnx
 
 __pycache__

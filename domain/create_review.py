@@ -1,12 +1,17 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
+import pickle
+import numpy as np
+
 from .review_schema import ReviewCreate
 
 from database import get_db
-from models import Review
+from models import Review, Product, Vectors, Cate_1
 
-from neural_networks.vectorizer import vectorize
+from neural_networks.vectorizer import sbert
+from neural_networks.binarizer import *
+from neural_networks.scorer import *
 
 router = APIRouter(
     prefix="/review/create",
@@ -17,9 +22,22 @@ router = APIRouter(
 def create_review(prod_id, db: Session, review: ReviewCreate):
     db_review = Review(prod_id=prod_id,
                        writer=review.writer,
-                       img_url=review.img_url,
+                       img_url=review.img_file,
                        content=review.content)
     db.add(db_review)
+    db.commit()
+    # 방금 생성된 리뷰의 ID 반환
+    return str(db.query(Review.id_).order_by(Review.id_.desc()).first()[0])
+
+def create_vector(rev_id, vec, db: Session):
+    db_vector = Vectors(id_=rev_id,
+                        vector=vec)
+    db.add(db_vector)
+    db.commit()
+
+def update_score_point(rev_id, points, db: Session):
+    db.query(Review).where(Review.id_ == str(rev_id)).update({Review.points:points, Review.status:2})
+    db.query(Vectors).where(Vectors.id_ == str(rev_id)).delete()
     db.commit()
     
 
@@ -34,26 +52,47 @@ def get_new_review_send_vector(prod_id:str,
     ##         2. VECTORS 테이블에 리뷰 ID와 카테고리, 리뷰 벡터(Binary) 저장
 
     ## Response: 리뷰 ID(str), 리뷰 벡터(str)
-    prod_id = str(prod_id)
-    create_review(prod_id, db, review_create)
+    # prod_id = str(prod_id)
 
-    vector = str(vectorize().tolist()) ### 모델을 넣어서 벡터 가져오기
+    # 상품 리뷰의 카테고리 가져오기
+    cateid = db.query(Product.cate1).where(Product.id_ == prod_id).first()[0]
+    category = db.query(Cate_1.name).where(Cate_1.id_ == cateid).first()[0]
+    
+    # 리뷰 DB에 저장, 리뷰 ID 반환
+    rev_id = create_review(prod_id, db, review_create)
+    
+    # 생성된 카테고리와 리뷰 모델에 넣어서 벡터 가져오기
+    vector = sbert([category, review_create.content]) 
+    # print(vector)
 
+    # binary_vector = pickle.dumps(vector)
+    binary_vector = vector
+    
+    create_vector(rev_id, binary_vector, db)
+    
     return {
-        'id' : prod_id,
-        'vector' : vector
+        'id' : rev_id,
+        'vector' : str(vector.tolist())
     }
 
-@router.post('/submit/{review_id}', status_code=status.HTTP_201_CREATED)
-def get_review_point(db: Session = Depends(get_db)):
+@router.post('/submit/{rev_id}', status_code=status.HTTP_201_CREATED)
+def get_review_point(rev_id:str, db: Session = Depends(get_db)):
     ## 리뷰 등록 가능 신호를 받고 
-    ## Input: 카테고리ID(str), 리뷰 본문(str)
+    ## Input: 리뷰 ID
     ## Output: REVIEW 테이블의 Point 컬럼에 적립 포인트 저장
 
-    ## Response: 등록 성공 코드(201), 리뷰 코드
+    ## Response: 등록 성공 코드(201)
 
+    # 벡터 찾아오기
+    vec = db.query(Vectors.vector).where(Vectors.id_ == str(rev_id)).first()[0]
+    
+    # 벡터로 1-3 점수 계산
+    score = get_score(vec)
+    point = get_point(score)
 
+    update_score_point(rev_id, point, db)
 
     return {
-        'review_id': '000'
+        'score' : score,
+        'point' : point
     }
