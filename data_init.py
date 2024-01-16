@@ -21,7 +21,7 @@ review = pd.read_csv(review,
 cate1 = pd.read_csv(cate1,
                      dtype={'CateId':str, 'CateName':str}
                      )
-cate_2 = pd.read_csv(cate_2,
+cate2 = pd.read_csv(cate2,
                      dtype={'CateId':str, 'CateName':str}
                      )
 
