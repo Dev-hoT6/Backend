@@ -12,12 +12,12 @@ router = APIRouter(
 )
 
 ### CRUD
-def get_goods_list(db: Session):
+def get_goods_list(db: Session = Depends(get_db)):
     goods_list = db.query(Product.id_, Product.name, Product.price, Product.img_url).all()
     cate_list = db.query(Cate_1.id_, Cate_1.name).all()
     return goods_list, cate_list
 
-def get_cate_goods_list(CateId: str, db: Session):
+def get_cate_goods_list(CateId: str, db: Session = Depends(get_db)):
     result = db.query(Product.id_, Product.name, Product.price, Product.img_url, Cate_1.name)\
             .join(Cate_1, Product.cate1 == Cate_1.id_)\
             .where(Product.cate1 == CateId).all()
