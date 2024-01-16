@@ -9,7 +9,7 @@ db_name = 'myapi.db'
 product = 'data_prototype/product.csv'
 review = 'data_prototype/reviews.csv'
 cate1 = 'data_prototype/cate_1.csv'
-cate2 = 'data_prototype/cate_2.csv',
+cate2 = 'data_prototype/cate_2.csv'
 # vectors = 'data_prototype/vectors.csv',
 
 product = pd.read_csv(product,
