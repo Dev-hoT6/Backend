@@ -46,15 +46,9 @@ def update_score_point(rev_id, points, db: Session):
     
 
 ### Router
-@router.post('/', status_code=status.HTTP_200_OK)
-def get_new_review_send_vector(review_create: ReviewCreate = Depends(),
-                               # default 안되는 버전 즉 무조건 이미지를 받는 버전
-                               files: List[UploadFile] = File(...),
-                               # 만약 위에 것이 정상으로 작동 된다면
-                               # 1. [파이썬 3.9]선택적으로 받는 버전 (test 못해봄)
-                               # files: Union[List[UploadFile], None] = None,
-                               # 2. [파이썬 3.10]선택적으로 받는 버전 (test 못해봄)
-                               # file: List[UploadFile] | None = None,
+@router.post('/{prod_id}', status_code=status.HTTP_200_OK)
+def get_new_review_send_vector(prod_id:str,
+                               review_create: ReviewCreate,
                                db: Session = Depends(get_db)):
                                
     ## 리뷰를 받아서 서버의 DB에 저장.
@@ -94,11 +88,19 @@ def get_review_point(rev_id:str,
 
     ## Response: 등록 성공 코드(201)
 
-    prod_id = db.query(Review.prod_id).where(Review.id_ == str(rev_id)).first()[0]
 
+    # 벡터 찾아오기
+    vec = db.query(Vectors.vector).where(Vectors.id_ == str(rev_id)).first()[0]
+    
+    # 벡터로 1-3 점수 계산
+    score = get_score(vec)
+    point = get_point(score)
+
+    update_score_point(rev_id, point, db)
     
     # 리뷰 DB에 저장, 리뷰 ID 반환
     img_path = "review_imgs"
+    prod_id = db.query(Review.prod_id).where(Review.id_ == str(rev_id)).first()[0]
     # 이미지 있는 경우
     if file:
         new_f_name = datetime.now(timezone('Asia/Seoul')).strftime(('%y%m%d%H%M%S_%f'))
@@ -114,14 +116,6 @@ def get_review_point(rev_id:str,
         # 리뷰를 데이터베이스에 저장
         db.query(Review).where(Review.id_ == str(rev_id)).update({Review.img_url:file_path})
 
-    # 벡터 찾아오기
-    vec = db.query(Vectors.vector).where(Vectors.id_ == str(rev_id)).first()[0]
-    
-    # 벡터로 1-3 점수 계산
-    score = get_score(vec)
-    point = get_point(score)
-
-    update_score_point(rev_id, point, db)
 
     return {
         'score' : score,

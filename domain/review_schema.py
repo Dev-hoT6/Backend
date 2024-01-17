@@ -2,7 +2,6 @@ from pydantic import BaseModel, field_validator
 
 
 class ReviewCreate(BaseModel):
-    prod_id: str
     writer: str
     content: str
 
