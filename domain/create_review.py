@@ -79,7 +79,8 @@ def get_new_review_send_vector(prod_id:str,
 
 @router.post('/submit/{rev_id}', status_code=status.HTTP_201_CREATED)
 def get_review_point(rev_id:str,
-                     file: UploadFile = File(...),
+                    #  file: UploadFile = File(...),
+                     file:UploadFile=None,
                     #  review_create:ReviewCreate=Depends(),
                      db: Session = Depends(get_db)):
     ## 리뷰 등록 가능 신호를 받고 
@@ -103,6 +104,7 @@ def get_review_point(rev_id:str,
     prod_id = db.query(Review.prod_id).where(Review.id_ == str(rev_id)).first()[0]
     # 이미지 있는 경우
     if file:
+        # file = File(file)
         new_f_name = datetime.now(timezone('Asia/Seoul')).strftime(('%y%m%d%H%M%S_%f'))
         extension = re.findall('\..+', file.filename)[0]
 

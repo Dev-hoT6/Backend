@@ -16,7 +16,7 @@ opt.graph_optimization_level= ort.GraphOptimizationLevel.ORT_ENABLE_EXTENDED
 opt.log_severity_level=3
 opt.execution_mode = ort.ExecutionMode.ORT_SEQUENTIAL
 
-ort_session = ort.InferenceSession(r'C:\Users\LukeLim\OneDrive\바탕 화면\Projects\Devcourse\Final\Backend\backend\neural_networks\S_Transformer-onnx.onnx', opt)
+ort_session = ort.InferenceSession('/home/ubuntu/backend/neural_networks/S_Transformer-onnx.onnx', opt)
 
 ### pooling 함수
 def mean_pooling(model_output, attention_mask):
