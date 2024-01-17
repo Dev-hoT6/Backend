@@ -2,8 +2,8 @@ from pydantic import BaseModel, field_validator
 
 
 class ReviewCreate(BaseModel):
+    prod_id: str
     writer: str
-    img_file: str
     content: str
 
     # @field_validator('content')
