@@ -1,7 +1,6 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, UploadFile, File
 from sqlalchemy.orm import Session
 
-import pickle
 import numpy as np
 
 from .review_schema import ReviewCreate
@@ -13,16 +12,21 @@ from neural_networks.vectorizer import sbert
 from neural_networks.binarizer import *
 from neural_networks.scorer import *
 
+import os
+import re
+from datetime import datetime
+from pytz import timezone
+
 router = APIRouter(
     prefix="/review/create",
 )
 
 
 ### CRUD
-def create_review(prod_id, db: Session, review: ReviewCreate):
+def create_review(prod_id, img_file, db: Session, review: ReviewCreate):
     db_review = Review(prod_id=prod_id,
                        writer=review.writer,
-                       img_url=review.img_file,
+                       img_url=img_file,
                        content=review.content)
     db.add(db_review)
     db.commit()
@@ -52,23 +56,19 @@ def get_new_review_send_vector(prod_id:str,
     ##         2. VECTORS 테이블에 리뷰 ID와 카테고리, 리뷰 벡터(Binary) 저장
 
     ## Response: 리뷰 ID(str), 리뷰 벡터(str)
-    # prod_id = str(prod_id)
 
     # 상품 리뷰의 카테고리 가져오기
     cateid = db.query(Product.cate1).where(Product.id_ == prod_id).first()[0]
     category = db.query(Cate_1.name).where(Cate_1.id_ == cateid).first()[0]
     
     # 리뷰 DB에 저장, 리뷰 ID 반환
-    rev_id = create_review(prod_id, db, review_create)
+    rev_id = create_review(prod_id, None, db, review_create)
     
     # 생성된 카테고리와 리뷰 모델에 넣어서 벡터 가져오기
     vector = sbert([category, review_create.content]) 
     # print(vector)
 
-    # binary_vector = pickle.dumps(vector)
-    binary_vector = vector
-    
-    create_vector(rev_id, binary_vector, db)
+    create_vector(rev_id, vector, db)
     
     return {
         'id' : rev_id,
@@ -76,12 +76,35 @@ def get_new_review_send_vector(prod_id:str,
     }
 
 @router.post('/submit/{rev_id}', status_code=status.HTTP_201_CREATED)
-def get_review_point(rev_id:str, db: Session = Depends(get_db)):
+def get_review_point(rev_id:str,
+                     file: UploadFile = File(...),
+                    #  review_create:ReviewCreate=Depends(),
+                     db: Session = Depends(get_db)):
     ## 리뷰 등록 가능 신호를 받고 
     ## Input: 리뷰 ID
     ## Output: REVIEW 테이블의 Point 컬럼에 적립 포인트 저장
 
     ## Response: 등록 성공 코드(201)
+
+    prod_id = db.query(Review.prod_id).where(Review.id_ == str(rev_id)).first()[0]
+
+    
+    # 리뷰 DB에 저장, 리뷰 ID 반환
+    img_path = "review_imgs"
+    # 이미지 있는 경우
+    if file:
+        new_f_name = datetime.now(timezone('Asia/Seoul')).strftime(('%y%m%d%H%M%S_%f'))
+        extension = re.findall('\..+', file.filename)[0]
+
+        # 각 이미지를 폴더에 저장
+        file_name = f"{prod_id}_{new_f_name}{extension}"
+        
+        # 이미지 파일을 로컬 서버에 저장
+        file_path = os.path.join(img_path, file_name)
+        with open(file_path, "wb") as buffer:
+            buffer.write(file.file.read())
+        # 리뷰를 데이터베이스에 저장
+        db.query(Review).where(Review.id_ == str(rev_id)).update({Review.img_url:file_path})
 
     # 벡터 찾아오기
     vec = db.query(Vectors.vector).where(Vectors.id_ == str(rev_id)).first()[0]
