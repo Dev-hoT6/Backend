@@ -9,7 +9,7 @@ opt.graph_optimization_level= ort.GraphOptimizationLevel.ORT_ENABLE_EXTENDED
 opt.log_severity_level=3
 opt.execution_mode = ort.ExecutionMode.ORT_SEQUENTIAL
 
-ort_session = ort.InferenceSession(r'C:\Users\LukeLim\OneDrive\바탕 화면\Projects\Devcourse\Final\Backend\backend\neural_networks\fully_connected_classifier_test.onnx', opt)
+ort_session = ort.InferenceSession(r'C:\Users\LukeLim\OneDrive\바탕 화면\Projects\Devcourse\Final\Backend\backend\neural_networks\fully_connected_classifier_123.onnx', opt)
 
 score_dict = {
     1 : 100,

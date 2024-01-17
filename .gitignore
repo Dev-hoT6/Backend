@@ -4,5 +4,6 @@ test.py
 *.ipynb
 *.pt
 *.onnx
+*.jpg
 
 __pycache__
