@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, status, UploadFile, File
 from sqlalchemy.orm import Session
 
 import numpy as np
-
+import os
 from .review_schema import ReviewCreate
 
 from database import get_db
@@ -46,10 +46,17 @@ def update_score_point(rev_id, points, db: Session):
     
 
 ### Router
-@router.post('/{prod_id}', status_code=status.HTTP_200_OK)
-def get_new_review_send_vector(prod_id:str,
-                               review_create:ReviewCreate,
+@router.post('/', status_code=status.HTTP_200_OK)
+def get_new_review_send_vector(review_create: ReviewCreate = Depends(),
+                               # default 안되는 버전 즉 무조건 이미지를 받는 버전
+                               files: List[UploadFile] = File(...),
+                               # 만약 위에 것이 정상으로 작동 된다면
+                               # 1. [파이썬 3.9]선택적으로 받는 버전 (test 못해봄)
+                               # files: Union[List[UploadFile], None] = None,
+                               # 2. [파이썬 3.10]선택적으로 받는 버전 (test 못해봄)
+                               # file: List[UploadFile] | None = None,
                                db: Session = Depends(get_db)):
+                               
     ## 리뷰를 받아서 서버의 DB에 저장.
     ## Input: 카테고리ID(str), 리뷰 본문(str), 리뷰 이미지(img)
     ## Output: 1. REVIEW 테이블에 리뷰 본문, 이미지저장
@@ -60,9 +67,10 @@ def get_new_review_send_vector(prod_id:str,
     # 상품 리뷰의 카테고리 가져오기
     cateid = db.query(Product.cate1).where(Product.id_ == prod_id).first()[0]
     category = db.query(Cate_1.name).where(Cate_1.id_ == cateid).first()[0]
-    
+                               
     # 리뷰 DB에 저장, 리뷰 ID 반환
     rev_id = create_review(prod_id, None, db, review_create)
+
     
     # 생성된 카테고리와 리뷰 모델에 넣어서 벡터 가져오기
     vector = sbert([category, review_create.content]) 
