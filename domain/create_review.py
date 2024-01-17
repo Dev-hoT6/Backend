@@ -1,7 +1,6 @@
-from fastapi import APIRouter, Depends, status, UploadFile, File
+from fastapi import APIRouter, Depends, status, UploadFile
 from sqlalchemy.orm import Session
 
-import numpy as np
 import os
 from .review_schema import ReviewCreate
 
@@ -18,7 +17,7 @@ from datetime import datetime
 from pytz import timezone
 
 router = APIRouter(
-    prefix="/review/create",
+    prefix="/review",
 )
 
 
@@ -46,7 +45,7 @@ def update_score_point(rev_id, points, db: Session):
     
 
 ### Router
-@router.post('/{prod_id}', status_code=status.HTTP_200_OK)
+@router.post('/create/{prod_id}', status_code=status.HTTP_200_OK)
 def get_new_review_send_vector(prod_id:str,
                                review_create: ReviewCreate,
                                db: Session = Depends(get_db)):
@@ -77,11 +76,9 @@ def get_new_review_send_vector(prod_id:str,
         'vector' : str(vector.tolist())
     }
 
-@router.post('/submit/{rev_id}', status_code=status.HTTP_201_CREATED)
+@router.post('/create/submit/{rev_id}', status_code=status.HTTP_201_CREATED)
 def get_review_point(rev_id:str,
-                    #  file: UploadFile = File(...),
                      file:UploadFile=None,
-                    #  review_create:ReviewCreate=Depends(),
                      db: Session = Depends(get_db)):
     ## 리뷰 등록 가능 신호를 받고 
     ## Input: 리뷰 ID
@@ -97,14 +94,12 @@ def get_review_point(rev_id:str,
     score = get_score(vec)
     point = get_point(score)
 
-    update_score_point(rev_id, point, db)
     
     # 리뷰 DB에 저장, 리뷰 ID 반환
     img_path = "review_imgs"
     prod_id = db.query(Review.prod_id).where(Review.id_ == str(rev_id)).first()[0]
     # 이미지 있는 경우
     if file:
-        # file = File(file)
         new_f_name = datetime.now(timezone('Asia/Seoul')).strftime(('%y%m%d%H%M%S_%f'))
         extension = re.findall('\..+', file.filename)[0]
 
@@ -115,11 +110,19 @@ def get_review_point(rev_id:str,
         file_path = os.path.join(img_path, file_name)
         with open(file_path, "wb") as buffer:
             buffer.write(file.file.read())
-        # 리뷰를 데이터베이스에 저장
+        # 리뷰 테이블에 사진 경로 저장
         db.query(Review).where(Review.id_ == str(rev_id)).update({Review.img_url:file_path})
 
+    update_score_point(rev_id, point, db)
 
     return {
         'score' : score,
         'point' : point
     }
+
+
+# @router.post('/delete/{rev_id}')
+# def delete_review(rev_id:str,
+#                   db: Session = Depends(get_db)
+#                   ):
+#     db.query(Review).where(Review.id_ == str(rev_id)).update({Review.status:-1})

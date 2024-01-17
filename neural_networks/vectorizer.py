@@ -1,7 +1,6 @@
 import torch
 import numpy as np
 
-import onnx
 import onnxruntime as ort
 
 from transformers import AutoTokenizer

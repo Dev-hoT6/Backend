@@ -26,7 +26,7 @@ def get_cate_goods_list(CateId: str, db: Session = Depends(get_db)):
 
 
 ### Router
-@router.get('/')
+@router.get('')
 def goods_list(db: Session = Depends(get_db)):
     goods_list, cate_list = get_goods_list(db)
     n_goods = len(goods_list)

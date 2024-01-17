@@ -35,7 +35,10 @@ def get_cate_goods_list(prod_id: str, db:Session = Depends(get_db)):
         "product_hashtags": product.hashtag,
         "product_price": product.price,
         "product_image_url": product.img_url,
-        "category1_name": category1.name,
+        "category1": {
+            "id": category1.id_,
+            "name": category1.name
+        }
         # "n_review": n_review
     }
     return response_data
@@ -44,29 +47,33 @@ def get_cate_goods_list(prod_id: str, db:Session = Depends(get_db)):
 def get_product_reviews(prod_id:str, db:Session = Depends(get_db)):
         # 리뷰가 있는 경우에만 추가
     #
+    is_product = db.query(Product).where(Product.id_ == prod_id).all()
+
+    if not is_product:
+        return HTTPException(status_code=404, detail='no product with the ID')
+
     reviews = db.query(Review)\
-        .where(Review.prod_id == prod_id)\
+        .where((Review.prod_id == prod_id) & (Review.status == 2))\
+        .order_by(Review.id_.desc())\
         .all()
 
+    response_data = {
+        'count':len(reviews),
+        'product':str(prod_id)
+    }
+
     if reviews:
-        response_data = {
-            'count':len(reviews),
-            'product':str(prod_id),
-            'detail': [
-                {
-                    "review_id": review.id_,
-                    "review_writer": review.writer,
-                    "review_content" : review.content,
-                    "review_image_path": review.img_path,
-                    "review_status": review.status
-                }   for review in reviews
-            ]
-        }
-    else: 
-        response_data = [
+        response_data['detail'] = [
             {
-                'detail':'no reviews'
-            }
+                 "review_id": review.id_,
+                 "review_writer": review.writer,
+                 "review_content" : review.content,
+                 "review_image_path": review.img_url,
+                 "review_points": review.points,
+                 "review_status": review.status
+            }   for review in reviews
         ]
-    
+    else: 
+        response_data['detail'] = []
+
     return response_data
