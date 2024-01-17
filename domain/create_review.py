@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, UploadFile, File
 from sqlalchemy.orm import Session
-
+from typing import List, Union
 import pickle
 import numpy as np
-
+import os
 from .review_schema import ReviewCreate
 
 from database import get_db
@@ -19,10 +19,10 @@ router = APIRouter(
 
 
 ### CRUD
-def create_review(prod_id, db: Session, review: ReviewCreate):
+def create_review(prod_id, img_file, db: Session, review: ReviewCreate):
     db_review = Review(prod_id=prod_id,
                        writer=review.writer,
-                       img_url=review.img_file,
+                       img_url=img_file,
                        content=review.content)
     db.add(db_review)
     db.commit()
@@ -42,10 +42,17 @@ def update_score_point(rev_id, points, db: Session):
     
 
 ### Router
-@router.post('/{prod_id}', status_code=status.HTTP_200_OK)
-def get_new_review_send_vector(prod_id:str,
-                               review_create:ReviewCreate,
+@router.post('/', status_code=status.HTTP_200_OK)
+def get_new_review_send_vector(review_create: ReviewCreate = Depends(),
+                               # default 안되는 버전 즉 무조건 이미지를 받는 버전
+                               files: List[UploadFile] = File(...),
+                               # 만약 위에 것이 정상으로 작동 된다면
+                               # 1. [파이썬 3.9]선택적으로 받는 버전 (test 못해봄)
+                               # files: Union[List[UploadFile], None] = None,
+                               # 2. [파이썬 3.10]선택적으로 받는 버전 (test 못해봄)
+                               # file: List[UploadFile] | None = None,
                                db: Session = Depends(get_db)):
+                               
     ## 리뷰를 받아서 서버의 DB에 저장.
     ## Input: 카테고리ID(str), 리뷰 본문(str), 리뷰 이미지(img)
     ## Output: 1. REVIEW 테이블에 리뷰 본문, 이미지저장
@@ -53,13 +60,33 @@ def get_new_review_send_vector(prod_id:str,
 
     ## Response: 리뷰 ID(str), 리뷰 벡터(str)
     # prod_id = str(prod_id)
-
+    prod_id = review_create.prod_id
     # 상품 리뷰의 카테고리 가져오기
     cateid = db.query(Product.cate1).where(Product.id_ == prod_id).first()[0]
     category = db.query(Cate_1.name).where(Cate_1.id_ == cateid).first()[0]
-    
+                               
     # 리뷰 DB에 저장, 리뷰 ID 반환
-    rev_id = create_review(prod_id, db, review_create)
+    img_path = "review_imgs"
+    # 이미지 있는 경우
+    if files:
+        # 각 이미지를 폴더에 저장
+        for file in files:
+            file_name = f"{prod_id}_{file.filename}"
+            # 이미지 파일을 로컬 서버에 저장
+            file_path = os.path.join(img_path, file_name)
+            with open(file_path, "wb") as buffer:
+                buffer.write(file.file.read())
+            # 리뷰를 데이터베이스에 저장
+            rev_id = create_review(prod_id, file_path, db, review_create)
+    else:
+        # 파일이 제공되지 않은 경우 리뷰만 데이터베이스에 저장
+        rev_id = create_review(prod_id, None, db, review_create)
+
+
+                                   
+    # 생성된 카테고리와 리뷰 모델에 넣어서 벡터 가져오기
+    vector = sbert([category, review_create.content]) 
+                                   rev_id = create_review(prod_id, db, review_create)
     
     # 생성된 카테고리와 리뷰 모델에 넣어서 벡터 가져오기
     vector = sbert([category, review_create.content]) 
