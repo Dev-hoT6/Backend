@@ -6,16 +6,12 @@
  
 저희는 리뷰 평가 AI 모델을 보여드리기 위해 간단한 의류 쇼핑 어플리케이션을 제작하여 그 안에 AI모델을 탑재하였으며 해당 레포지토리는 해당 어플리케이션을 구동하기 위한 백엔드 레포지토리입니다.
 
----
-
 ## Framework
 - fastapi
 
----
 ## Database
 - sqlite
 
----
 ## backend structure
 ``` python
 backend
@@ -40,7 +36,6 @@ backend
 ├─ main.py
 └─ models.py
 ```
----
 
 ## 핵심 구조 설명
 data_prototype : 데이터베이스에 들어갈 초기 쇼핑몰 데이터가 들어있는 파일
