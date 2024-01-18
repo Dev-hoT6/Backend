@@ -14,6 +14,77 @@ sqlite
 
 ## backend structure
 
+
+📦
+├─ README.md
+└─ polarstar
+   ├─ .eslintrc.json
+   ├─ .gitignore
+   ├─ README.md
+   ├─ next.config.js
+   ├─ package-lock.json
+   ├─ package.json
+   ├─ postcss.config.js
+   ├─ public
+   │  ├─ images
+   │  │  ├─ favicon.ico
+   │  │  ├─ loading
+   │  │  │  └─ north.png
+   │  │  ├─ onboarding
+   │  │  │  ├─ icon_1.png
+   │  │  │  ├─ icon_2.png
+   │  │  │  ├─ icon_3.png
+   │  │  │  ├─ mainPageUpscaled.png
+   │  │  │  ├─ north.png
+   │  │  │  └─ polar-bear.png
+   │  │  └─ qna
+   │  │     ├─ arrow_next.png
+   │  │     ├─ arrow_prev.png
+   │  │     └─ close.png
+   │  ├─ next.svg
+   │  └─ vercel.svg
+   ├─ src
+   │  ├─ app
+   │  │  ├─ dummyData.tsx
+   │  │  ├─ globals.css
+   │  │  ├─ layout.tsx
+   │  │  ├─ page.tsx
+   │  │  ├─ qna
+   │  │  │  ├─ page.tsx
+   │  │  │  ├─ qnaData.tsx
+   │  │  │  ├─ skillStack.json
+   │  │  │  └─ skillStackData.tsx
+   │  │  ├─ ref.tsx
+   │  │  └─ result
+   │  │     ├─ jd
+   │  │     │  └─ page.tsx
+   │  │     └─ lec
+   │  │        └─ page.tsx
+   │  ├─ components
+   │  │  ├─ bubble.tsx
+   │  │  ├─ button.tsx
+   │  │  ├─ curriCell.tsx
+   │  │  ├─ fadeButton.tsx
+   │  │  ├─ introduce.tsx
+   │  │  ├─ jdRecommendCell.tsx
+   │  │  ├─ jdRecommendSummary.tsx
+   │  │  ├─ objective.tsx
+   │  │  ├─ onboarding.tsx
+   │  │  ├─ opacityAni.tsx
+   │  │  ├─ recoil.tsx
+   │  │  ├─ seo.tsx
+   │  │  ├─ skill.tsx
+   │  │  ├─ skillSearchDropdown.tsx
+   │  │  └─ subjective.tsx
+   │  ├─ global
+   │  │  ├─ globalAtom.tsx
+   │  │  └─ globalConstant.tsx
+   │  └─ interfaces
+   │     ├─ components.tsx
+   │     └─ server.tsx
+   ├─ tailwind.config.js
+   └─ tsconfig.json
+
 backend
 ├─ read.me
 
