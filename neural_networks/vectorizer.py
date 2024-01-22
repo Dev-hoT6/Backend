@@ -15,13 +15,19 @@ opt.graph_optimization_level= ort.GraphOptimizationLevel.ORT_ENABLE_EXTENDED
 opt.log_severity_level=3
 opt.execution_mode = ort.ExecutionMode.ORT_SEQUENTIAL
 
-ort_session = ort.InferenceSession('/home/ubuntu/backend/neural_networks/S_Transformer-onnx.onnx', opt)
+ort_session = ort.InferenceSession('/home/ubuntu/backend/neural_networks/SBERT_fp16.onnx', opt)
+# ort_session = ort.InferenceSession(r'C:\Users\LukeLim\OneDrive\바탕 화면\Projects\Devcourse\Final\Backend\backend\neural_networks\SBERT_fp16.onnx', opt)
+
+
+
 
 ### pooling 함수
 def mean_pooling(model_output, attention_mask):
     token_embeddings = torch.tensor(model_output[0]) #First element of model_output contains all token embeddings
     input_mask_expanded = attention_mask.unsqueeze(-1).expand(token_embeddings.shape).float()
     return torch.sum(token_embeddings * input_mask_expanded, 1) / torch.clamp(input_mask_expanded.sum(1), min=1e-9)
+
+
 
 ### 모델 가져와서 벡터화
 def encode(text):
@@ -30,6 +36,7 @@ def encode(text):
 
 def vectorize(encoded_input):
     encoded_input_np = {name : np.atleast_2d(value) for name, value in encoded_input.items()}
+    encoded_input_np.pop('token_type_ids')
     vc = ort_session.run(None, encoded_input_np)
     se = mean_pooling(vc, encoded_input['attention_mask'])
     return se

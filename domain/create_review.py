@@ -8,7 +8,6 @@ from database import get_db
 from models import Review, Product, Vectors, Cate_1
 
 from neural_networks.vectorizer import sbert
-from neural_networks.binarizer import *
 from neural_networks.scorer import *
 
 import os
@@ -111,7 +110,8 @@ def get_review_point(rev_id:str,
         with open(file_path, "wb") as buffer:
             buffer.write(file.file.read())
         # 리뷰 테이블에 사진 경로 저장
-        db.query(Review).where(Review.id_ == str(rev_id)).update({Review.img_url:file_path})
+        save_path = 'http://34.227.141.109:3000/'+file_path
+        db.query(Review).where(Review.id_ == str(rev_id)).update({Review.img_url:save_path})
 
     update_score_point(rev_id, point, db)
 
