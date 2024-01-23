@@ -16,11 +16,6 @@
 ``` python
 backend
 ├─ README.md
-├─ data_prototype
-│  ├─ cate_1.csv
-│  ├─ cate_2.csv
-│  ├─ product.csv
-│  └─ reviews.csv
 ├─ domain
 │  ├─ create_review.py
 │  ├─ detail.py
@@ -38,7 +33,10 @@ backend
 ```
 
 ## 핵심 구조 설명
+- `main.py` : domain에서 정의한 API 엔드포인트들이 애플리케이션에 등록되고 사용하게 하는 파일
+- `models.py` : 데이터 베이스의 스키마 파일
+
 - `domain` : api를 생성하기 위한 라우터, 스키마 등의 모델이 들어있는 폴더
 - `neural_networks` : 리뷰를 카테고리와 관련성에 따라 백터화하는 모델과 관련있는 리뷰를 3단계로 분류하는 모델이 들어있는 폴더
-- `models.py` : 데이터 베이스의 스키마 파일
-- `main.py` : domain에서 정의한 API 엔드포인트들이 애플리케이션에 등록되고 사용하게 하는 파일
+
+- `data_init.py` : 샘플 데이터를 DB에 Insert하는 파일

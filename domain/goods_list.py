@@ -4,9 +4,6 @@ from sqlalchemy.orm import Session
 from database import get_db
 from models import Product, Cate_1
 
-
-
-
 router = APIRouter(
     prefix="/product",
 )

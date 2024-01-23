@@ -9,7 +9,7 @@ app = FastAPI()
 app.mount('/review_imgs', StaticFiles(directory='review_imgs'), name='review_imgs')
 
 origins = [
-    "http://localhost:5173",    # 또는 "http://localhost:5173"
+    "http://localhost:5173",
 ]
 
 app.add_middleware(

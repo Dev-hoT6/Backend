@@ -5,5 +5,7 @@ test.py
 *.pt
 *.onnx
 *.jpg
+*.txt
 
+data_prototype
 __pycache__

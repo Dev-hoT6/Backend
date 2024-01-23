@@ -29,7 +29,6 @@ class Review(Base):
     content = Column('Content', String(300), nullable=False)
     points = Column('Points', Integer, default=0)
     status = Column('Status', Integer, default=0)
-
     products = relationship('Product', backref='reviews')
 
 

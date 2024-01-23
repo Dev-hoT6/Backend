@@ -19,6 +19,8 @@ router = APIRouter(
     prefix="/review",
 )
 
+with open('server_ip.txt') as f:
+    ip = f.read()
 
 ### CRUD
 def create_review(prod_id, img_file, db: Session, review: ReviewCreate):
@@ -48,14 +50,15 @@ def update_score_point(rev_id, points, db: Session):
 def get_new_review_send_vector(prod_id:str,
                                review_create: ReviewCreate,
                                db: Session = Depends(get_db)):
-                               
-    ## 리뷰를 받아서 서버의 DB에 저장.
-    ## Input: 카테고리ID(str), 리뷰 본문(str), 리뷰 이미지(img)
-    ## Output: 1. REVIEW 테이블에 리뷰 본문, 이미지저장
-    ##         2. VECTORS 테이블에 리뷰 ID와 카테고리, 리뷰 벡터(Binary) 저장
+    '''
+    리뷰를 받아서 서버의 DB에 저장.
+    
+    Input: 카테고리ID(str), 리뷰 본문(str), 리뷰 이미지(img)
+    Output: 1. REVIEW 테이블에 리뷰 본문, 이미지저장
+            2. VECTORS 테이블에 리뷰 ID와 카테고리, 리뷰 벡터(Binary) 저장
 
-    ## Response: 리뷰 ID(str), 리뷰 벡터(str)
-
+    Response: 리뷰 ID(str), 리뷰 벡터(str)
+    '''
     # 상품 리뷰의 카테고리 가져오기
     cateid = db.query(Product.cate1).where(Product.id_ == prod_id).first()[0]
     category = db.query(Cate_1.name).where(Cate_1.id_ == cateid).first()[0]
@@ -79,11 +82,13 @@ def get_new_review_send_vector(prod_id:str,
 def get_review_point(rev_id:str,
                      file:UploadFile=None,
                      db: Session = Depends(get_db)):
-    ## 리뷰 등록 가능 신호를 받고 
-    ## Input: 리뷰 ID
-    ## Output: REVIEW 테이블의 Point 컬럼에 적립 포인트 저장
+    '''
+    리뷰 등록 가능 신호를 받고 
+    Input: 리뷰 ID
+    Output: REVIEW 테이블의 Point 컬럼에 적립 포인트 저장
 
-    ## Response: 등록 성공 코드(201)
+    Response: 등록 성공 코드(201)
+    '''
 
 
     # 벡터 찾아오기
@@ -110,7 +115,7 @@ def get_review_point(rev_id:str,
         with open(file_path, "wb") as buffer:
             buffer.write(file.file.read())
         # 리뷰 테이블에 사진 경로 저장
-        save_path = 'http://34.227.141.109:3000/'+file_path
+        save_path = ip+file_path
         db.query(Review).where(Review.id_ == str(rev_id)).update({Review.img_url:save_path})
 
     update_score_point(rev_id, point, db)
@@ -119,10 +124,3 @@ def get_review_point(rev_id:str,
         'score' : score,
         'point' : point
     }
-
-
-# @router.post('/delete/{rev_id}')
-# def delete_review(rev_id:str,
-#                   db: Session = Depends(get_db)
-#                   ):
-#     db.query(Review).where(Review.id_ == str(rev_id)).update({Review.status:-1})
